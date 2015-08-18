@@ -19,7 +19,7 @@ module WeeblyApi
   #   token.store_id      # these are what you need to access the API
   #
   class OAuth
-    CONFIG = %w(client_id client_secret scope redirect_uri user_id site_id)
+    CONFIG = %w(client_id client_secret scope redirect_uri user_id site_id next_oauth_url)
     attr_accessor *CONFIG
 
     # Public: Initializes a new Weebly Authentication for OAuth
@@ -46,7 +46,7 @@ module WeeblyApi
     # with the Weebly store.
     #
     def oauth_url
-      "https://marketplace.beta.weebly.com/app-center/oauth/authorize?" + oauth_query
+      next_oauth_url + "?" + oauth_query
     end
 
     # Public: Obtain the access token in order to use the API
