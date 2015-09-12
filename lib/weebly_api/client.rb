@@ -11,7 +11,7 @@ module WeeblyApi
     extend Forwardable
 
     # The default base URL for the Weebly API
-    DEFAULT_URL = "https://api-marketplace.beta.weebly.com/"
+    DEFAULT_URL = "https://api.weebly.com/"
 
     # Public: Returns the Weebly site ID
     attr_reader :site_id
