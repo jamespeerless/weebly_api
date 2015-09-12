@@ -97,7 +97,13 @@ module WeeblyApi
     # Private: Returns a connection for obtaining an access token from Weebly
     #
     def connection
-      @connection ||= Faraday.new "https://marketplace.beta.weebly.com" do |conn|
+      if next_oauth_url.nil? || next_oauth_url.empty?
+        host = "https://www.weebly.com"
+      else
+        host = "https://" + URI.parse(next_oauth_url).host
+      end
+
+      @connection ||= Faraday.new host do |conn|
         conn.adapter  Faraday.default_adapter
         conn.response :json
       end
