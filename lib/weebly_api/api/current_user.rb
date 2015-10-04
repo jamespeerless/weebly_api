@@ -4,7 +4,7 @@ module WeeblyApi
     # of the Weebly API that deal with orders.
     class CurrentUser < Base
       def fetch
-        response = client.get("")
+        response = client.get_with_rety("", 3)
         if response.success?
           User.new(response.body, client: client)
         end

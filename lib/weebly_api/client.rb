@@ -18,7 +18,7 @@ module WeeblyApi
     attr_reader :token
     attr_reader :adapter
 
-    attr_reader :connection, :orders, :store, :user, :site
+    attr_reader :connection, :orders, :products, :store, :user, :site
 
     # Public: Initializes a new Client to interact with the API
     #
@@ -35,6 +35,7 @@ module WeeblyApi
       end
 
       @orders     = Api::Orders.new(self)
+      @products   = Api::Products.new(self)
       @store      = Api::CurrentStore.new(self)
       @user       = Api::CurrentUser.new(self)
       @site       = Api::CurrentSite.new(self)
@@ -43,6 +44,17 @@ module WeeblyApi
     # Public: The URL of the API for the Weebly Site
     def user_url
       "#{DEFAULT_URL}/v1/user/"
+    end
+
+    def get_with_rety(url, retry_count = 0)
+      response = get(url)
+      if response.success?
+        response
+      elsif retry_count > 0
+        get_with_retry(url, retry_count - 1)
+      else
+        response
+      end
     end
 
     def_delegators :connection, :get, :post, :put, :delete

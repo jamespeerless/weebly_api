@@ -26,7 +26,7 @@ module WeeblyApi
       #
       # Returns an WeeblyApi::Order if found, nil if not
       def find(order_id, order_item_id)
-        response = client.get("/store/orders/#{order_id}/items/#{order_item_id}")
+        response = client.get_with_retry("/store/orders/#{order_id}/items/#{order_item_id}", 3)
         if response.success?
           OrderItem.new(response.body, client: client)
         end

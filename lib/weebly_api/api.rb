@@ -3,6 +3,7 @@ module WeeblyApi
   module Api
     require_relative "api/base"
     require_relative "api/orders"
+    require_relative "api/products"
     require_relative "api/current_site"
     require_relative "api/current_store"
     require_relative "api/current_user"
