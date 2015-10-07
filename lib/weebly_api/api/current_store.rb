@@ -4,7 +4,7 @@ module WeeblyApi
     # of the Weebly API that deal with orders.
     class CurrentStore < Base
       def fetch
-        response = client.get_with_rety("sites/#{client.site_id}/store", 3)
+        response = client.get_with_retry("sites/#{client.site_id}/store", 3)
         if response.success?
           Store.new(response.body, client: client)
         end

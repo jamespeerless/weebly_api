@@ -46,7 +46,7 @@ module WeeblyApi
       "#{DEFAULT_URL}/v1/user/"
     end
 
-    def get_with_rety(url, retry_count = 0)
+    def get_with_retry(url, retry_count = 0)
       response = get(url)
       if response.success?
         response
