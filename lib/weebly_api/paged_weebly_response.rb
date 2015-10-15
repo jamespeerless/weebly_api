@@ -33,7 +33,7 @@ module WeeblyApi
       params.delete(:offset)
 
       block ||= Proc.new { |item| item }
-      response = client.get(path, params)
+      response = client.get_with_params_retry(path, params, 3)
 
       @paged_enumerator = PagedEnumerator.new(response) do |response, yielder|
         response.body.each do |item|
@@ -49,7 +49,7 @@ module WeeblyApi
         if count == 0 || count + offset >= total
           false
         else
-          client.get(path, params.merge(page: page + 1))
+          client.get_with_params_retry(path, params.merge(page: page + 1), 3)
         end
       end
     end
