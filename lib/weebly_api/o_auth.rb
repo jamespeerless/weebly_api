@@ -72,7 +72,26 @@ module WeeblyApi
       if response.success?
         OpenStruct.new(response.body)
       else
-        raise Error.new(response.body["error_description"])
+        response = connection.post do |req|
+          req.url "/app-center/oauth/access_token"
+          req.headers['Content-Type'] = 'application/json'
+          req.body = {:client_id => client_id, :client_secret => client_secret, :authorization_code => code}.to_json
+        end
+        if response.success?
+          OpenStruct.new(response.body)
+        else
+          response = connection.post do |req|
+            req.url "/app-center/oauth/access_token"
+            req.headers['Content-Type'] = 'application/json'
+            req.body = {:client_id => client_id, :client_secret => client_secret, :authorization_code => code}.to_json
+          end
+      
+          if response.success?
+            OpenStruct.new(response.body)
+          else
+            raise Error.new(response.body["error_description"])
+          end
+        end
       end
     end
 
