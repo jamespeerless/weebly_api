@@ -51,7 +51,7 @@ module WeeblyApi
       if response.success?
         response
       elsif retry_count > 0
-        get_with_retry(url, params, retry_count - 1)
+        get_with_params_retry(url, params, retry_count - 1)
       else
         response
       end
