@@ -28,17 +28,21 @@ module WeeblyApi
     def initialize(site_id, token, adapter = Faraday.default_adapter)
       @site_id, @token, @adapter = site_id, token, adapter
 
-      @connection = Faraday.new({:url => user_url, :headers => {:x_weebly_access_token => token}}) do |conn|
-        conn.request  :json
-        conn.response :json
-        conn.adapter  adapter
-      end
-
+      self.reset_connection
+      
       @orders     = Api::Orders.new(self)
       @products   = Api::Products.new(self)
       @store      = Api::CurrentStore.new(self)
       @user       = Api::CurrentUser.new(self)
       @site       = Api::CurrentSite.new(self)
+    end
+
+    def reset_connection
+      @connection = Faraday.new({:url => user_url, :headers => {:x_weebly_access_token => @token.reload.access_token}}) do |conn|
+        conn.request  :json
+        conn.response :json
+        conn.adapter  @adapter
+      end
     end
 
     # Public: The URL of the API for the Weebly Site
@@ -51,6 +55,7 @@ module WeeblyApi
       if response.success?
         response
       elsif retry_count > 0
+        self.reset_connection
         get_with_params_retry(url, params, retry_count - 1)
       else
         response
@@ -62,6 +67,7 @@ module WeeblyApi
       if response.success?
         response
       elsif retry_count > 0
+        self.reset_connection
         get_with_retry(url, retry_count - 1)
       else
         response
