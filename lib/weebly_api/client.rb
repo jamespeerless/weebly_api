@@ -104,19 +104,26 @@ module WeeblyApi
     end
 
     def report_payment_with_retry(opts, retry_count = 0)
-      connection = Faraday.new({:url => "#{DEFAULT_URL}/v1", :headers => {:x_weebly_access_token => @token.reload.access_token}}) do |conn|
+      connection = Faraday.new({:url => "#{DEFAULT_URL}/v1/", :headers => {:x_weebly_access_token => @token.reload.access_token}}) do |conn|
         conn.request  :json
+        conn.response :logger
         conn.response :json
         conn.adapter  @adapter
       end
 
       opts[:payable_amount] = opts[:gross_amount].to_f * 0.30
 
+      Rails.logger.debug opts.inspect
+      Rails.logger.debug "****JSON****"
+      Rails.logger.debug opts.to_json
+      
       response = connection.post do |req|
-        req.url "/admin/app/payment_notifications"
+        req.url "admin/app/payment_notifications"
         req.headers['Content-Type'] = 'application/json'
         req.body = opts.to_json
       end
+
+      Rails.logger.debug response.inspect
 
       if response.success?
         response
