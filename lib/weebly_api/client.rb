@@ -29,7 +29,7 @@ module WeeblyApi
       @site_id, @token, @adapter = site_id, token, adapter
 
       self.reset_connection
-      
+
       @orders     = Api::Orders.new(self)
       @products   = Api::Products.new(self)
       @store      = Api::CurrentStore.new(self)
@@ -42,6 +42,88 @@ module WeeblyApi
         conn.request  :json
         conn.response :json
         conn.adapter  @adapter
+      end
+    end
+
+    def report_subscription_payment(opts)
+
+      if Rails.env.production?
+        opts[:method] = "purchase"
+      else
+        opts[:method] = "testpurchase"
+      end
+
+      opts[:kind] = "recurring"
+      opts[:detail] = "Payment for Swell subscription for #{Date.today.month}/#{Date.today.year}"
+      self.report_subscription_action(opts)
+    end
+
+    def report_subscription_refund(opts)
+      if Rails.env.production?
+        opts[:method] = "refund"
+      else
+        opts[:method] = "testrefund"
+      end
+      opts[:kind] = "cancel"
+      opts[:detail] = "Refund for Swell subscription for #{Date.today.month}/#{Date.today.year}"
+      self.report_subscription_action(opts)
+    end
+
+
+    def report_point_purchase(opts)
+      if Rails.env.production?
+        opts[:method] = "purchase"
+      else
+        opts[:method] = "testpurchase"
+      end
+      opts[:detail] = "Payment for Swell Point Purchase"
+      self.report_payment_with_retry(opts, 3)
+    end
+
+    def report_point_refund(opts)
+      if Rails.env.production?
+        opts[:method] = "refund"
+      else
+        opts[:method] = "testrefund"
+      end
+      opts[:detail] = "Refund for Swell Point Purchase"
+      self.report_payment_with_retry(opts, 3)
+    end
+
+    def report_point_action(opts)
+      opts[:name] = "Swell Point Purchase"
+      opts[:term] = "forever"
+      opts[:kind] = "single"
+      self.report_payment_with_retry(opts, 3)
+    end
+
+    def report_subscription_action(opts)
+      opts[:name] = "Swell Subscription Fee"
+      opts[:term] = "month"
+      self.report_payment_with_retry(opts, 3)
+    end
+
+    def report_payment_with_retry(opts, retry_count = 0)
+      connection = Faraday.new({:url => "#{DEFAULT_URL}/v1", :headers => {:x_weebly_access_token => @token.reload.access_token}}) do |conn|
+        conn.request  :json
+        conn.response :json
+        conn.adapter  @adapter
+      end
+
+      opts[:payable_amount] = opts[:gross_amount].to_f * 0.30
+
+      response = connection.post do |req|
+        req.url "/admin/app/payment_notifications"
+        req.headers['Content-Type'] = 'application/json'
+        req.body = opts.to_json
+      end
+
+      if response.success?
+        response
+      elsif retry_count > 0
+        self.report_payment_with_retry(opts, retry_count - 1)
+      else
+        response
       end
     end
 
