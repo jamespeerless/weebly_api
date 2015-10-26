@@ -113,10 +113,13 @@ module WeeblyApi
 
       opts[:payable_amount] = opts[:gross_amount].to_f * 0.30
 
+      puts opts.inspect
+      puts "***JSON***"
+      puts opts.to_json
       Rails.logger.debug opts.inspect
       Rails.logger.debug "****JSON****"
       Rails.logger.debug opts.to_json
-      
+
       response = connection.post do |req|
         req.url "admin/app/payment_notifications"
         req.headers['Content-Type'] = 'application/json'
