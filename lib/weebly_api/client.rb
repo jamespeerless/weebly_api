@@ -77,7 +77,7 @@ module WeeblyApi
         opts[:method] = "testpurchase"
       end
       opts[:detail] = "Payment for Swell Point Purchase"
-      self.report_payment_with_retry(opts, 3)
+      self.report_point_action(opts)
     end
 
     def report_point_refund(opts)
@@ -87,7 +87,7 @@ module WeeblyApi
         opts[:method] = "testrefund"
       end
       opts[:detail] = "Refund for Swell Point Purchase"
-      self.report_payment_with_retry(opts, 3)
+      self.report_point_action(opts)
     end
 
     def report_point_action(opts)
@@ -113,20 +113,11 @@ module WeeblyApi
 
       opts[:payable_amount] = opts[:gross_amount].to_f * 0.30
 
-      puts opts.inspect
-      puts "***JSON***"
-      puts opts.to_json
-      Rails.logger.debug opts.inspect
-      Rails.logger.debug "****JSON****"
-      Rails.logger.debug opts.to_json
-
       response = connection.post do |req|
         req.url "admin/app/payment_notifications"
         req.headers['Content-Type'] = 'application/json'
         req.body = opts.to_json
       end
-
-      Rails.logger.debug response.inspect
 
       if response.success?
         response
