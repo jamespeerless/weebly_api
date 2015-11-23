@@ -20,4 +20,5 @@ module WeeblyApi
   require_relative "weebly_api/site"
   require_relative "weebly_api/store"
   require_relative "weebly_api/user"
+  require_relative "weebly_api/coupon"
 end

@@ -18,7 +18,7 @@ module WeeblyApi
     attr_reader :token
     attr_reader :adapter
 
-    attr_reader :connection, :orders, :products, :store, :user, :site
+    attr_reader :connection, :orders, :products, :store, :user, :site, :coupons
 
     # Public: Initializes a new Client to interact with the API
     #
@@ -35,6 +35,7 @@ module WeeblyApi
       @store      = Api::CurrentStore.new(self)
       @user       = Api::CurrentUser.new(self)
       @site       = Api::CurrentSite.new(self)
+      @coupons    = Api::Coupons.new(self)
     end
 
     def reset_connection
