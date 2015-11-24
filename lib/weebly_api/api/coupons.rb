@@ -20,6 +20,10 @@ module WeeblyApi
         end
       end
 
+      def create(params)
+        response = client.post("sites/#{client.site_id}/store/coupons", params)
+      end
+
       # Public: Finds a an Coupon given an Weebly coupon_id
       #
       # coupon_id - an Integer that is the Weebly Coupon number
